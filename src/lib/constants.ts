@@ -12,21 +12,25 @@ export const leadCategoryOptions = [
 ] as const;
 
 export const pipelineStages = [
-  { value: "NEW", label: "New" },
-  { value: "QUALIFIED", label: "Qualified" },
+  { value: "NEW_LEAD", label: "New Lead" },
+  { value: "RESEARCHING", label: "Researching" },
   { value: "CONTACTED", label: "Contacted" },
-  { value: "SITE_SURVEY", label: "Site survey" },
-  { value: "PROPOSAL_SENT", label: "Proposal sent" },
-  { value: "NEGOTIATING", label: "Negotiating" },
+  { value: "FOLLOW_UP_SCHEDULED", label: "Follow-Up Scheduled" },
+  { value: "INSPECTION_SCHEDULED", label: "Inspection Scheduled" },
+  { value: "PROPOSAL_SENT", label: "Proposal Sent" },
   { value: "WON", label: "Won" },
   { value: "LOST", label: "Lost" },
+  { value: "NURTURE", label: "Nurture" },
 ] as const;
 
 export const outreachTypeOptions = [
-  { value: "CALL", label: "Call" },
+  { value: "PHONE_CALL", label: "Phone call" },
   { value: "EMAIL", label: "Email" },
-  { value: "TEXT", label: "Text" },
-  { value: "VISIT", label: "Visit" },
+  { value: "IN_PERSON_VISIT", label: "In-person visit" },
+  { value: "VOICEMAIL", label: "Voicemail" },
+  { value: "TEXT_MESSAGE", label: "Text message" },
+  { value: "PROPOSAL_SENT", label: "Proposal sent" },
+  { value: "FOLLOW_UP_REMINDER", label: "Follow-up reminder" },
   { value: "LINKEDIN", label: "LinkedIn" },
   { value: "FACEBOOK", label: "Facebook" },
 ] as const;

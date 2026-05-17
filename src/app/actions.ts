@@ -53,9 +53,14 @@ export async function importLeadAction(formData: FormData) {
     website: String(formData.get("website") ?? "") || undefined,
     phone: String(formData.get("phone") ?? "") || undefined,
     description: String(formData.get("description") ?? "") || undefined,
+    city: String(formData.get("city") ?? "") || undefined,
     state: String(formData.get("state") ?? "") || undefined,
     rating: Number(formData.get("rating") ?? "") || undefined,
     reviewCount: parseOptionalInt(formData.get("reviewCount")),
+    unitCount: parseOptionalInt(formData.get("unitCount")),
+    employeeCount: parseOptionalInt(formData.get("employeeCount")),
+    latitude: Number(formData.get("latitude") ?? "") || undefined,
+    longitude: Number(formData.get("longitude") ?? "") || undefined,
   };
   const score = calculateLeadScore(scoreInput);
   const googlePlaceId = String(formData.get("googlePlaceId") ?? "") || undefined;
@@ -229,12 +234,14 @@ export async function addOutreachAction(formData: FormData) {
   const userId = await requireSessionUserId();
   const leadId = String(formData.get("leadId"));
   const summary = String(formData.get("summary") ?? "").trim();
-  const outreachType = (String(formData.get("type")) as OutreachType) || OutreachType.CALL;
+  const outreachType = (String(formData.get("type")) as OutreachType) || OutreachType.PHONE_CALL;
   const socialStatus =
     String(formData.get("socialOutreachStatus") ?? "") ||
     String(formData.get("outcome") ?? "") ||
     undefined;
   const socialFollowUpAt = parseOptionalDate(formData.get("socialFollowUpAt"));
+  const happenedAt = parseOptionalDate(formData.get("happenedAt")) ?? new Date();
+  const nextAction = String(formData.get("nextAction") ?? "").trim() || undefined;
 
   if (!summary) {
     return;
@@ -248,18 +255,20 @@ export async function addOutreachAction(formData: FormData) {
       subject: String(formData.get("subject") ?? "") || undefined,
       summary,
       outcome: String(formData.get("outcome") ?? "") || undefined,
+      nextAction,
+      happenedAt,
     },
   });
 
   await prisma.lead.update({
     where: { id: leadId },
     data: {
-      lastContactedAt: new Date(),
+      lastContactedAt: happenedAt,
       outreachStatus: String(formData.get("outcome") ?? "") || "Outreach logged",
       ...(outreachType === OutreachType.LINKEDIN || outreachType === OutreachType.FACEBOOK
         ? {
             socialOutreachStatus: socialStatus ?? "Social outreach logged",
-            socialLastMessageAt: new Date(),
+            socialLastMessageAt: happenedAt,
             socialFollowUpAt,
             nextFollowUpAt: socialFollowUpAt ?? undefined,
           }
@@ -337,11 +346,16 @@ export async function refreshLeadScoreAction(formData: FormData) {
     category: lead.category,
     website: lead.website,
     phone: lead.phone,
+    rating: lead.rating,
+    reviewCount: lead.reviewCount,
     employeeCount: lead.employeeCount,
     unitCount: lead.unitCount,
     isPriority: lead.isPriority,
     description: lead.description,
+    city: lead.city,
     state: lead.state,
+    latitude: lead.latitude,
+    longitude: lead.longitude,
   });
 
   await prisma.lead.update({

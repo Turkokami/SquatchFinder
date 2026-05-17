@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getLeadCategoryLabel, getPriorityLevel, getLeadStatusLabel } from "@/lib/lead-insights";
 
 export async function GET() {
   const leads = await prisma.lead.findMany({
     include: {
-      contacts: {
-        orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
-        take: 1,
+      notes: {
+        orderBy: { createdAt: "desc" },
+        take: 5,
       },
     },
     orderBy: [{ stage: "asc" }, { score: "desc" }],
@@ -16,28 +17,30 @@ export async function GET() {
     [
       "Business Name",
       "Category",
-      "Stage",
-      "Score",
+      "Address",
       "City",
-      "State",
       "Phone",
       "Website",
-      "Primary Contact",
-      "Primary Contact Email",
-      "Next Follow Up",
+      "Lead Score",
+      "Priority Level",
+      "Status",
+      "Last Contacted Date",
+      "Next Follow-Up Date",
+      "Notes",
     ],
     ...leads.map((lead) => [
       lead.businessName,
-      lead.category,
-      lead.stage,
-      String(lead.score),
+      getLeadCategoryLabel(lead.category),
+      [lead.addressLine1, lead.state, lead.postalCode].filter(Boolean).join(", "),
       lead.city ?? "",
-      lead.state ?? "",
       lead.phone ?? "",
       lead.website ?? "",
-      lead.contacts[0]?.name ?? "",
-      lead.contacts[0]?.email ?? "",
+      String(lead.score),
+      getPriorityLevel(lead.score, lead.isPriority),
+      getLeadStatusLabel(lead.stage),
+      lead.lastContactedAt?.toISOString() ?? "",
       lead.nextFollowUpAt?.toISOString() ?? "",
+      lead.notes.map((note) => note.body).join(" || "),
     ]),
   ];
 

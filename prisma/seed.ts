@@ -22,7 +22,7 @@ const seedLeads = [
   {
     businessName: "Cascade View Multifamily",
     category: LeadCategory.MULTIFAMILY,
-    stage: LeadStage.QUALIFIED,
+    stage: LeadStage.RESEARCHING,
     city: "Seattle",
     state: "WA",
     addressLine1: "4120 Summit Ave",
@@ -120,7 +120,10 @@ async function main() {
       employeeCount: lead.employeeCount,
       unitCount: lead.unitCount,
       state: lead.state,
+      city: lead.city,
       isPriority: true,
+      latitude: lead.latitude,
+      longitude: lead.longitude,
     });
 
     await prisma.lead.upsert({
@@ -177,9 +180,10 @@ async function main() {
         outreachHistory: {
           create: [
             {
-              type: OutreachType.CALL,
+              type: OutreachType.PHONE_CALL,
               summary: "Introduced Sasquatch Pest Control and confirmed the decision maker.",
               outcome: "Interested in quarterly service pricing.",
+              nextAction: "Send pricing follow-up",
               userId: admin.id,
             },
           ],

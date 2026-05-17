@@ -259,9 +259,12 @@ async function upsertProspectLead(result: ProspectSearchResult) {
     website: result.website,
     phone: result.phone,
     description: result.description,
+    city: result.city,
     state: result.state,
     rating: result.rating,
     reviewCount: result.reviewCount,
+    latitude: result.latitude,
+    longitude: result.longitude,
   });
   const score = {
     score: Math.min(100, baseScore.score + restaurantBoost.scoreBoost),
@@ -457,21 +460,24 @@ export async function searchAndSaveProspects(input: ProspectSearchInput): Promis
   if (!apiKey) {
     return Promise.all(
       searchDemoPlaces(input.keyword ?? "", input.category, input.city).map(async (place, index) => {
+        const cityCenter = cityToFallbackCenter(input.city);
+        const latitude = cityCenter.latitude + index * 0.015;
+        const longitude = cityCenter.longitude - index * 0.012;
+
         const score = calculateLeadScore({
           category: place.category,
           website: place.website,
           phone: place.phone,
           description: place.description,
+          city: place.city,
           employeeCount: place.employeeCount,
           unitCount: place.unitCount,
           state: place.state,
           rating: 4.2,
           reviewCount: 30 + index * 4,
+          latitude,
+          longitude,
         });
-
-        const cityCenter = cityToFallbackCenter(input.city);
-        const latitude = cityCenter.latitude + index * 0.015;
-        const longitude = cityCenter.longitude - index * 0.012;
 
         const result: ProspectSearchResult = {
           businessName: place.businessName,
@@ -570,9 +576,12 @@ export async function searchAndSaveProspects(input: ProspectSearchInput): Promis
         website: details?.website,
         phone: details?.formatted_phone_number,
         description: details?.types?.join(" "),
+        city: address.city,
         state: address.state,
         rating,
         reviewCount,
+        latitude: details?.geometry?.location?.lat ?? place.geometry?.location?.lat,
+        longitude: details?.geometry?.location?.lng ?? place.geometry?.location?.lng,
       });
 
       const result: ProspectSearchResult = {

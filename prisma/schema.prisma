@@ -31,21 +31,25 @@ enum LeadCategory {
 }
 
 enum LeadStage {
-  NEW
-  QUALIFIED
+  NEW_LEAD
+  RESEARCHING
   CONTACTED
-  SITE_SURVEY
+  FOLLOW_UP_SCHEDULED
+  INSPECTION_SCHEDULED
   PROPOSAL_SENT
-  NEGOTIATING
   WON
   LOST
+  NURTURE
 }
 
 enum OutreachType {
-  CALL
+  PHONE_CALL
   EMAIL
-  TEXT
-  VISIT
+  IN_PERSON_VISIT
+  VOICEMAIL
+  TEXT_MESSAGE
+  PROPOSAL_SENT
+  FOLLOW_UP_REMINDER
   LINKEDIN
   FACEBOOK
 }
@@ -75,7 +79,7 @@ model Lead {
   businessName         String
   slug                 String       @unique
   category             LeadCategory
-  stage                LeadStage    @default(NEW)
+  stage                LeadStage    @default(NEW_LEAD)
   score                Int          @default(0)
   scoreSummary         String?
   googlePlaceId        String?      @unique
@@ -166,6 +170,7 @@ model Outreach {
   subject   String?
   summary   String
   outcome   String?
+  nextAction String?
   happenedAt DateTime    @default(now())
 }
 

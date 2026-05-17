@@ -639,6 +639,7 @@ export default async function LeadDetailPage({ params }: LeadDetailProps) {
                   </div>
                   <p className="mt-2 text-sm leading-6 text-slate-600">{item.summary}</p>
                   {item.outcome ? <p className="mt-2 text-sm text-emerald-700">{item.outcome}</p> : null}
+                  {item.nextAction ? <p className="mt-2 text-sm text-slate-500">Next action: {item.nextAction}</p> : null}
                 </div>
               ))}
             </div>
@@ -662,15 +663,25 @@ export default async function LeadDetailPage({ params }: LeadDetailProps) {
                   className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
                 />
               </div>
+              <input
+                name="happenedAt"
+                type="datetime-local"
+                className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
+              />
               <textarea
                 name="summary"
-                placeholder="What happened during the outreach?"
+                placeholder="Notes from the phone call, email, visit, voicemail, text, proposal, or follow-up reminder..."
                 rows={4}
                 className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
               />
               <input
                 name="outcome"
                 placeholder="Outcome or next step"
+                className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
+              />
+              <input
+                name="nextAction"
+                placeholder="Next action"
                 className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
               />
               <button

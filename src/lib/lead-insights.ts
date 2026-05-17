@@ -1,4 +1,5 @@
 import { leadCategoryOptions, pipelineStages } from "@/lib/constants";
+import { getLeadPriorityLabel } from "@/lib/scoring";
 
 export function getLeadCategoryLabel(category: string) {
   return (
@@ -15,15 +16,11 @@ export function getLeadStatusLabel(status: string) {
 }
 
 export function getPriorityLevel(score: number, isPriority?: boolean | null) {
-  if (isPriority || score >= 80) {
-    return "High";
+  if (isPriority) {
+    return "High Priority";
   }
 
-  if (score >= 60) {
-    return "Medium";
-  }
-
-  return "Low";
+  return getLeadPriorityLabel(score);
 }
 
 export function getEstimatedUrgency(score: number, isPriority?: boolean | null) {

@@ -347,11 +347,13 @@ export function MapLeadExplorer({ leads, initialCenter }: ExplorerProps) {
                       setDrawerOpen(true);
                     }}
                     className={`flex h-10 w-10 items-center justify-center rounded-full border-2 border-white text-sm font-bold text-white shadow-lg ${
-                      priority === "High"
+                      priority === "High Priority"
                         ? "bg-rose-500"
-                        : priority === "Medium"
+                        : priority === "Medium Priority"
                           ? "bg-amber-500"
-                          : "bg-sky-500"
+                          : priority === "Low Priority"
+                            ? "bg-sky-500"
+                            : "bg-slate-500"
                     }`}
                     aria-label={`Open ${lead.businessName}`}
                   >
@@ -443,7 +445,7 @@ export function MapLeadExplorer({ leads, initialCenter }: ExplorerProps) {
                   </button>
                   <form action={updateLeadStageAction}>
                     <input type="hidden" name="leadId" value={selectedLead.id} />
-                    <input type="hidden" name="stage" value="QUALIFIED" />
+                    <input type="hidden" name="stage" value="RESEARCHING" />
                     <button
                       type="submit"
                       className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
