@@ -1,0 +1,186 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  REP
+}
+
+enum LeadCategory {
+  RESTAURANT
+  APARTMENTS
+  MULTIFAMILY
+  HOA
+  RETIREMENT
+  FOOD_MANUFACTURER
+  COMMERCIAL_KITCHEN
+  BREWERY
+  GROCERY
+  PROPERTY_MANAGEMENT
+}
+
+enum LeadStage {
+  NEW
+  QUALIFIED
+  CONTACTED
+  SITE_SURVEY
+  PROPOSAL_SENT
+  NEGOTIATING
+  WON
+  LOST
+}
+
+enum OutreachType {
+  CALL
+  EMAIL
+  TEXT
+  VISIT
+  LINKEDIN
+  FACEBOOK
+}
+
+enum ReminderStatus {
+  OPEN
+  DONE
+  SKIPPED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         UserRole   @default(REP)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  leads        Lead[]     @relation("LeadOwner")
+  notes        Note[]
+  outreach     Outreach[]
+  reminders    Reminder[] @relation("ReminderOwner")
+}
+
+model Lead {
+  id                   String       @id @default(cuid())
+  businessName         String
+  slug                 String       @unique
+  category             LeadCategory
+  stage                LeadStage    @default(NEW)
+  score                Int          @default(0)
+  scoreSummary         String?
+  googlePlaceId        String?      @unique
+  googleMapsUrl        String?
+  addressLine1         String?
+  city                 String?
+  state                String?
+  postalCode           String?
+  website              String?
+  phone                String?
+  email                String?
+  facebookBusinessPageUrl String?
+  linkedinCompanyPageUrl  String?
+  decisionMakerLinkedinUrl String?
+  decisionMakerFacebookUrl String?
+  socialSourceUrl      String?
+  socialContactRole    String?
+  socialOutreachStatus String?
+  socialLastMessageAt  DateTime?
+  socialFollowUpAt     DateTime?
+  description          String?
+  rating               Float?
+  reviewCount          Int?
+  openingHours         String[]     @default([])
+  unitCount            Int?
+  employeeCount        Int?
+  latitude             Float?
+  longitude            Float?
+  annualRevenueBand    String?
+  estimatedOpportunity String?
+  outreachAngle        String?
+  outreachStatus       String?
+  lastContactedAt      DateTime?
+  nextFollowUpAt       DateTime?
+  isPriority           Boolean      @default(false)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  ownerId              String?
+  owner                User?        @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  contacts             Contact[]
+  notes                Note[]
+  outreachHistory      Outreach[]
+  reminders            Reminder[]
+
+  @@index([stage])
+  @@index([category])
+  @@index([score])
+  @@index([state, city])
+}
+
+model Contact {
+  id               String   @id @default(cuid())
+  leadId           String
+  lead             Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  name             String
+  title            String?
+  businessAssociation String?
+  linkedinUrl      String?
+  facebookUrl      String?
+  email            String?
+  phone            String?
+  sourceUrl        String?
+  confidenceScore  Int?
+  discoveryNotes   String?
+  isPrimary        Boolean  @default(false)
+  preferredChannel String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Outreach {
+  id        String       @id @default(cuid())
+  leadId    String
+  lead      Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      OutreachType
+  subject   String?
+  summary   String
+  outcome   String?
+  happenedAt DateTime    @default(now())
+}
+
+model Reminder {
+  id          String         @id @default(cuid())
+  leadId      String
+  lead        Lead           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  ownerId     String?
+  owner       User?          @relation("ReminderOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  title       String
+  dueAt       DateTime
+  status      ReminderStatus @default(OPEN)
+  notes       String?
+  createdAt   DateTime       @default(now())
+  completedAt DateTime?
+
+  @@index([dueAt, status])
+}
